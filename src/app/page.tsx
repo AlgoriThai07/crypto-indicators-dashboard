@@ -2,7 +2,11 @@ import IndicatorCard from "@/components/IndicatorCard";
 import type { CryptoIndex } from "@/types/crypto";
 
 async function getIndices() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  // Use absolute URL only in production, relative URL won't work for SSR
+  const baseUrl = process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : "http://localhost:3000";
+  
   const res = await fetch(`${baseUrl}/api/indices`, {
     next: { revalidate: 90 }, // Revalidate every 90 seconds
   });
