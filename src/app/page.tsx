@@ -3,24 +3,35 @@ import type { CryptoIndex } from "@/types/crypto";
 
 async function getIndices() {
   // Use absolute URL only in production, relative URL won't work for SSR
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
-  
-  const res = await fetch(`${baseUrl}/api/indices`, {
-    next: { revalidate: 90 }, // Revalidate every 90 seconds
-  });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch indices");
+  try {
+    const res = await fetch(`${baseUrl}/api/indices`, {
+      next: { revalidate: 90 }, // Revalidate every 90 seconds
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`API Error (${res.status}):`, errorText);
+      throw new Error(`Failed to fetch indices: ${res.status} - ${errorText}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('Fetch error:', error);
+    // Return empty data instead of crashing the page
+    return { data: [], cached: false, timestamp: new Date().toISOString() };
   }
-
-  return res.json();
 }
 
 export default async function Home() {
   const response = await getIndices();
-  const indices: CryptoIndex[] = response.data;
+  const indices: CryptoIndex[] = response.data || [];
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -44,19 +55,30 @@ export default async function Home() {
           )}
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {indices.map((index) => (
-            <IndicatorCard
-              key={index.id}
-              id={index.id}
-              name={index.name}
-              symbol={index.symbol}
-              image={index.image}
-              price={index.current_price}
-              change24h={index.price_change_percentage_24h}
-            />
-          ))}
-        </div>
+        {indices.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-slate-600 dark:text-slate-400 text-lg mb-4">
+              Unable to load cryptocurrency data at the moment.
+            </p>
+            <p className="text-slate-500 dark:text-slate-500 text-sm">
+              This might be due to API rate limits. Please try again in a few minutes.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {indices.map((index) => (
+              <IndicatorCard
+                key={index.id}
+                id={index.id}
+                name={index.name}
+                symbol={index.symbol}
+                image={index.image}
+                price={index.current_price}
+                change24h={index.price_change_percentage_24h}
+              />
+            ))}
+          </div>
+        )}
 
         <footer className="mt-12 text-center text-sm text-slate-500 dark:text-slate-400">
           <p>Data provided by CoinGecko API</p>

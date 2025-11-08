@@ -40,7 +40,7 @@ export async function GET() {
     // Check cache first - return immediately if data exists
     const cachedData = cache.get<CryptoIndex[]>(CACHE_KEY);
     if (cachedData) {
-      console.log("[API] Serving from cache (TTL: 120s)");
+      console.log("[API] ✅ Serving from cache (TTL: 120s)");
       return NextResponse.json({
         data: cachedData,
         cached: true,
@@ -48,7 +48,8 @@ export async function GET() {
       });
     }
 
-    console.log("[API] Cache miss, fetching from CoinGecko...");
+    console.log("[API] ⚠️ Cache miss, fetching from CoinGecko...");
+    console.log("[API] Environment:", process.env.VERCEL ? "Vercel" : "Local");
 
     // Rate limiting check (20 req/min)
     const now = Date.now();
@@ -103,7 +104,7 @@ export async function GET() {
     cache.set(CACHE_KEY, data, CACHE_TTL); // Normal cache with TTL
     cache.set(STALE_CACHE_KEY, data, 0); // Stale cache (no expiry)
 
-    console.log("[API] Successfully fetched and cached data");
+    console.log("[API] ✅ Successfully fetched and cached", data.length, "coins");
 
     return NextResponse.json({
       data,
@@ -111,7 +112,16 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error fetching crypto indices:", error);
+    console.error("❌ [API] Error fetching crypto indices:", error);
+    
+    if (axios.isAxiosError(error)) {
+      console.error("❌ [API] Axios error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
 
     // Try to serve stale data when rate-limited or error occurs
     const staleData = cache.get<CryptoIndex[]>(STALE_CACHE_KEY);
