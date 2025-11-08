@@ -30,17 +30,19 @@ export default function WebSocketTestPage() {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             Debug Information
           </h2>
-          
+
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2 border-b border-slate-200 dark:border-slate-700">
               <span className="text-slate-600 dark:text-slate-400 font-medium">
                 Connection Status:
               </span>
-              <span className={`font-bold ${
-                isConnected 
-                  ? "text-green-600 dark:text-green-400" 
-                  : "text-red-600 dark:text-red-400"
-              }`}>
+              <span
+                className={`font-bold ${
+                  isConnected
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
                 {isConnected ? "✓ Connected" : "✗ Disconnected"}
               </span>
             </div>
@@ -58,11 +60,13 @@ export default function WebSocketTestPage() {
               <span className="text-slate-600 dark:text-slate-400 font-medium">
                 24h Change:
               </span>
-              <span className={`font-bold ${
-                change24h && change24h >= 0
-                  ? "text-green-600 dark:text-green-400"
-                  : "text-red-600 dark:text-red-400"
-              }`}>
+              <span
+                className={`font-bold ${
+                  change24h && change24h >= 0
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
                 {change24h ? `${change24h.toFixed(2)}%` : "N/A"}
               </span>
             </div>
@@ -81,9 +85,7 @@ export default function WebSocketTestPage() {
                 Last Update:
               </span>
               <span className="text-slate-900 dark:text-white font-mono text-sm">
-                {lastUpdate
-                  ? new Date(lastUpdate).toLocaleTimeString()
-                  : "N/A"}
+                {lastUpdate ? new Date(lastUpdate).toLocaleTimeString() : "N/A"}
               </span>
             </div>
 
@@ -137,9 +139,7 @@ export default function WebSocketTestPage() {
             🔌 API Endpoint
           </h3>
           <div className="bg-white dark:bg-slate-900 rounded-lg p-4 font-mono text-sm">
-            <p className="text-slate-600 dark:text-slate-400 mb-2">
-              Endpoint:
-            </p>
+            <p className="text-slate-600 dark:text-slate-400 mb-2">Endpoint:</p>
             <p className="text-blue-600 dark:text-blue-400 mb-4">
               GET /api/socket
             </p>

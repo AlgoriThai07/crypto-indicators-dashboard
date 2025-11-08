@@ -31,6 +31,7 @@ export async function GET() {
 ```
 
 **Routes:**
+
 - `/api/indices` - Main crypto indices (15 coins)
 - `/api/indices/[id]/history` - 30-day historical data
 - `/api/socket` - Live Bitcoin price streaming (SSE)
@@ -48,20 +49,22 @@ COINGECKO_API_KEY=your_api_key_here
 ```
 
 **Implementation:**
+
 ```typescript
 // Automatically uses API key if available
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY;
 
 const headers: Record<string, string> = {
-  'Accept': 'application/json',
+  Accept: "application/json",
 };
 
 if (COINGECKO_API_KEY) {
-  headers['x-cg-pro-api-key'] = COINGECKO_API_KEY;
+  headers["x-cg-pro-api-key"] = COINGECKO_API_KEY;
 }
 ```
 
 **Benefits:**
+
 - Free tier: Works without API key
 - Pro tier ($129/month): Add key for 500 req/min
 - Enterprise: Custom limits
@@ -89,6 +92,7 @@ cache.set(CACHE_KEY, response.data, CACHE_TTL);
 ```
 
 **Cache Strategy:**
+
 - **Primary cache**: 120-second TTL (2 minutes)
 - **Stale cache**: Permanent backup for rate limit fallback
 - **Cache-first**: Always check cache before API call
@@ -108,6 +112,7 @@ const CACHE_TTL = 120; // 120 seconds ✅
 ```
 
 **Why 120 seconds?**
+
 - Upper bound of 60-120s range
 - Reduces API calls by 50% vs 60s
 - Still provides reasonably fresh data
@@ -144,6 +149,7 @@ export async function GET() {
 ```
 
 **Protection Mechanisms:**
+
 1. **Request counter**: Tracks calls per minute
 2. **Automatic throttling**: Serves cached data when limit reached
 3. **Stale data fallback**: Never returns errors due to self-imposed limits
@@ -156,13 +162,16 @@ export async function GET() {
 **Estimated Usage:**
 
 **Without caching:**
+
 - 15 coins × 24 hours × 30 days = 10,800 API calls/month ❌
 
 **With 120-second caching:**
+
 - Main indices: 30 calls/hour × 24 hours × 30 days = 21,600 potential calls
 - With cache: 21,600 ÷ 60 = **360 actual API calls/month** ✅
 
 **Breakdown:**
+
 ```
 Endpoint                | Cache TTL | Calls/Hour | Calls/Day | Calls/Month
 ------------------------|-----------|------------|-----------|-------------
@@ -183,11 +192,13 @@ Endpoint                | Cache TTL | Calls/Hour | Calls/Day | Calls/Month
 ### Cache Hit Rate
 
 **Expected performance:**
+
 - First request: Cache miss → API call
 - Next 2 minutes: Cache hit → No API call
 - After 2 minutes: Cache miss → API call
 
 **Hit rate calculation:**
+
 ```
 Cache duration: 120 seconds
 Average user visit duration: 5 minutes (300 seconds)
@@ -218,6 +229,7 @@ catch (error) {
 ```
 
 **Benefits:**
+
 1. Never shows errors to users during rate limits
 2. Maintains functionality even when API is unavailable
 3. Transparent to end users
@@ -242,11 +254,13 @@ catch (error) {
 ## Setup Instructions
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Configure Environment (Optional)
+
 ```bash
 # Copy example file
 cp .env.example .env.local
@@ -256,11 +270,13 @@ cp .env.example .env.local
 ```
 
 ### 3. Run Development Server
+
 ```bash
 npm run dev
 ```
 
 ### 4. Monitor Compliance
+
 ```bash
 # Check server logs for:
 # - Cache hit/miss rates
@@ -273,18 +289,21 @@ npm run dev
 ## Production Recommendations
 
 ### For Free Tier (No API Key):
+
 1. ✅ Keep 120-second cache TTL
 2. ✅ Use stale data fallback
 3. ✅ Monitor server logs
 4. ⚠️ Limit to single instance (no horizontal scaling)
 
 ### For Pro Tier ($129/month):
+
 1. Add `COINGECKO_API_KEY` to environment
 2. Can reduce cache TTL to 60 seconds (still compliant)
 3. Can handle multiple instances
 4. 500 req/min limit (much higher)
 
 ### For Production at Scale:
+
 1. Consider Redis for distributed caching
 2. Implement CDN caching (Vercel Edge)
 3. Add monitoring/alerting for rate limits
@@ -309,18 +328,21 @@ npm run dev
 ## Testing Compliance
 
 ### Test Cache Hit Rate:
+
 1. Visit http://localhost:3000
 2. Check console: `[API] Serving from cache`
 3. Refresh within 2 minutes → Should see cache hit
 4. Wait 2+ minutes → Should see API call
 
 ### Test Rate Limiting:
+
 1. Make 20+ rapid requests
 2. Check console: `Request 20/20 in current window`
 3. 21st request should serve stale data
 4. No 429 errors should occur
 
 ### Test Stale Data Fallback:
+
 1. Simulate rate limit (modify code temporarily)
 2. Verify stale data is served
 3. Check for user-friendly warning message
@@ -331,6 +353,7 @@ npm run dev
 ## Support
 
 For questions or issues:
+
 1. Check server console logs
 2. Visit `/diagnostics` page for debugging
 3. Test API directly: `/api/test-bitcoin`

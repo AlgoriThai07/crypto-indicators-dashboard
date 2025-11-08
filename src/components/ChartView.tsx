@@ -22,14 +22,13 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const price = payload[0].value;
     const date = payload[0].payload.date;
-    
+
     return (
       <div className="bg-[#1e293b] rounded-lg px-4 py-3 shadow-2xl border border-slate-700">
-        <p className="text-slate-400 text-xs font-medium mb-1">
-          {date}
-        </p>
+        <p className="text-slate-400 text-xs font-medium mb-1">{date}</p>
         <p className="text-white text-lg font-bold">
-          ${price.toLocaleString(undefined, {
+          $
+          {price.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
@@ -52,7 +51,7 @@ export default function ChartView({ data }: ChartViewProps) {
     const now = new Date();
     const diffMs = now.getTime() - lastUpdate.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return "just now";
     if (diffMins === 1) return "1 min ago";
     return `${diffMins} mins ago`;
@@ -67,9 +66,13 @@ export default function ChartView({ data }: ChartViewProps) {
   const yAxisMax = Math.ceil(maxPrice + priceRange * 0.05);
 
   return (
-    <div className="bg-slate-900 rounded-2xl shadow-2xl overflow-hidden" style={{
-      boxShadow: "inset 0 1px 0 0 rgba(148, 163, 184, 0.1), 0 10px 25px -5px rgba(0, 0, 0, 0.5)"
-    }}>
+    <div
+      className="bg-slate-900 rounded-2xl shadow-2xl overflow-hidden"
+      style={{
+        boxShadow:
+          "inset 0 1px 0 0 rgba(148, 163, 184, 0.1), 0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+      }}
+    >
       {/* Chart Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center gap-3 mb-2">
@@ -91,7 +94,7 @@ export default function ChartView({ data }: ChartViewProps) {
       <div className="px-4 pb-6">
         <div className="w-full h-[300px] md:h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart 
+            <AreaChart
               data={data}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
             >
@@ -101,22 +104,22 @@ export default function ChartView({ data }: ChartViewProps) {
                   <stop offset="0%" stopColor="#38bdf8" />
                   <stop offset="100%" stopColor="#2563eb" />
                 </linearGradient>
-                
+
                 {/* Gradient fill under the line */}
                 <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.2} />
                   <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              
+
               {/* Subtle grid lines */}
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="#1e293b" 
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#1e293b"
                 strokeOpacity={0.5}
                 vertical={false}
               />
-              
+
               {/* X-Axis */}
               <XAxis
                 dataKey="date"
@@ -127,7 +130,7 @@ export default function ChartView({ data }: ChartViewProps) {
                 interval="preserveStartEnd"
                 minTickGap={40}
               />
-              
+
               {/* Y-Axis */}
               <YAxis
                 stroke="#9ca3af"
@@ -143,14 +146,18 @@ export default function ChartView({ data }: ChartViewProps) {
                 }
                 width={70}
               />
-              
+
               {/* Custom Tooltip */}
-              <Tooltip 
-                content={<CustomTooltip />} 
-                cursor={{ stroke: "#38bdf8", strokeWidth: 1, strokeDasharray: "5 5" }}
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{
+                  stroke: "#38bdf8",
+                  strokeWidth: 1,
+                  strokeDasharray: "5 5",
+                }}
                 animationDuration={200}
               />
-              
+
               {/* Area fill with gradient */}
               <Area
                 type="monotone"

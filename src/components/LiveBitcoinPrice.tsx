@@ -3,8 +3,15 @@
 import { useLiveBitcoin } from "@/hooks/useLiveBitcoin";
 
 export default function LiveBitcoinPrice() {
-  const { price, change24h, isConnected, isCached, error, lastUpdate, reconnect } =
-    useLiveBitcoin();
+  const {
+    price,
+    change24h,
+    isConnected,
+    isCached,
+    error,
+    lastUpdate,
+    reconnect,
+  } = useLiveBitcoin();
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-lg border-2 border-blue-200 dark:border-blue-800 p-6">
@@ -21,7 +28,7 @@ export default function LiveBitcoinPrice() {
             Live Bitcoin Price
           </h3>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {isCached && (
             <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 font-semibold">
@@ -35,9 +42,11 @@ export default function LiveBitcoinPrice() {
                 : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${
-              isConnected ? "bg-green-500" : "bg-red-500"
-            }`}></span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                isConnected ? "bg-green-500" : "bg-red-500"
+              }`}
+            ></span>
             {isConnected ? "Connected" : "Disconnected"}
           </div>
         </div>
@@ -47,12 +56,13 @@ export default function LiveBitcoinPrice() {
       {price !== null ? (
         <div className="mb-4">
           <div className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-2 font-mono">
-            ${price.toLocaleString(undefined, {
+            $
+            {price.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </div>
-          
+
           {change24h !== null && (
             <div
               className={`inline-flex items-center gap-2 text-lg font-semibold px-3 py-1 rounded-lg ${

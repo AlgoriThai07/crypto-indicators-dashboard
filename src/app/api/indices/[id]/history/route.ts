@@ -23,18 +23,20 @@ export async function GET(
       return NextResponse.json(cachedData);
     }
 
-    console.log(`[History API] Cache miss, fetching 30-day history for ${id}...`);
+    console.log(
+      `[History API] Cache miss, fetching 30-day history for ${id}...`
+    );
 
     // Build API URL with optional API key
     const url = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30`;
-    
+
     const headers: Record<string, string> = {
-      'Accept': 'application/json',
+      Accept: "application/json",
     };
 
     // Add API key if available
     if (COINGECKO_API_KEY) {
-      headers['x-cg-pro-api-key'] = COINGECKO_API_KEY;
+      headers["x-cg-pro-api-key"] = COINGECKO_API_KEY;
     }
 
     const response = await axios.get(url, {

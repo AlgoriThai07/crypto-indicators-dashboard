@@ -7,6 +7,7 @@ A professional cryptocurrency tracking dashboard built with **Next.js 16**, **Ty
 This application provides a clean, responsive interface for monitoring cryptocurrency market data. It fetches real-time information from the CoinGecko API and displays the top 10 cryptocurrencies by market cap with 24-hour price changes. Users can click on any cryptocurrency to view detailed 30-day price history charts.
 
 **Key Features:**
+
 - Real-time cryptocurrency market data for 10 major coins
 - **Live Bitcoin price streaming** via Server-Sent Events (SSE)
 - Interactive 30-day historical price charts
@@ -29,9 +30,11 @@ This application provides a clean, responsive interface for monitoring cryptocur
 ## 🌐 API Endpoints
 
 ### GET `/api/indices`
+
 Fetches the top 10 cryptocurrencies by market cap.
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -51,12 +54,15 @@ Fetches the top 10 cryptocurrencies by market cap.
 ```
 
 ### GET `/api/indices/[id]/history`
+
 Fetches 30-day price history for a specific cryptocurrency.
 
 **Parameters:**
+
 - `id`: Cryptocurrency identifier (e.g., "bitcoin", "ethereum")
 
 **Response:**
+
 ```json
 {
   "prices": [
@@ -68,11 +74,13 @@ Fetches 30-day price history for a specific cryptocurrency.
 ```
 
 ### GET `/api/socket` 🔴 LIVE
+
 **Server-Sent Events (SSE)** endpoint for real-time Bitcoin price streaming.
 
 **Connection Type:** `text/event-stream`
 
 **Features:**
+
 - Live Bitcoin price updates every 10 seconds
 - Automatic reconnection on disconnect
 - Rate-limiting with 10-second minimum interval
@@ -80,6 +88,7 @@ Fetches 30-day price history for a specific cryptocurrency.
 - Cached data fallback during rate limits
 
 **Event Types:**
+
 ```typescript
 // Connection established
 { type: "connected", message: "Connected to Bitcoin price stream", timestamp: "..." }
@@ -95,15 +104,17 @@ Fetches 30-day price history for a specific cryptocurrency.
 ```
 
 **Usage Example:**
+
 ```javascript
-const eventSource = new EventSource('/api/socket');
+const eventSource = new EventSource("/api/socket");
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  console.log('Bitcoin Price:', data.data.price);
+  console.log("Bitcoin Price:", data.data.price);
 };
 ```
 
 **React Hook:**
+
 ```typescript
 import { useLiveBitcoin } from "@/hooks/useLiveBitcoin";
 
@@ -138,18 +149,21 @@ The application implements intelligent server-side caching using **NodeCache** t
 ## 🚀 Setup Instructions
 
 ### Prerequisites
+
 - Node.js 18+ and npm/yarn/pnpm
 - Git
 
 ### Local Development
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/AlgoriThai07/crypto-indicators-dashboard.git
    cd crypto-indicators-dashboard
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    ```
@@ -183,10 +197,13 @@ This application is optimized for deployment on **Vercel**:
 4. Deploy with one click
 
 **Environment Variables** (optional):
+
 - `NEXT_PUBLIC_BASE_URL`: Your production URL
 
 ### Alternative Platforms
+
 The application can also be deployed on:
+
 - AWS Amplify
 - Netlify
 - Railway
@@ -197,16 +214,19 @@ The application can also be deployed on:
 The application is designed to comply with CoinGecko API rate limits:
 
 **CoinGecko Free Tier Limits:**
+
 - 10-30 requests per minute
 - ~500 requests per month
 
 **Our Compliance Strategy:**
+
 1. **Server-side caching** (120s TTL) reduces API calls by 99%
 2. **Cache-first architecture** ensures minimal external requests
 3. **Graceful error handling** for 429 (rate-limit) responses
 4. **Request consolidation** - batch data where possible
 
 **Estimated Usage:**
+
 - Without cache: ~1,800 requests/hour (exceeds limits)
 - With cache: ~30 requests/hour (well within limits)
 
@@ -217,11 +237,13 @@ The application is designed to comply with CoinGecko API rate limits:
 For real-time price updates without polling, consider implementing WebSocket connections:
 
 **Benefits:**
+
 - Instant price updates without page refresh
 - Reduced server load compared to polling
 - Better user experience with live data
 
 **Implementation Approach:**
+
 ```typescript
 // Example: CoinGecko doesn't offer WebSockets, but you could integrate
 // with alternative providers like:
@@ -231,18 +253,19 @@ For real-time price updates without polling, consider implementing WebSocket con
 
 // Client-side example:
 useEffect(() => {
-  const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
-  
+  const ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@ticker");
+
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     updatePrice(data.c); // Current price
   };
-  
+
   return () => ws.close();
 }, []);
 ```
 
 **Considerations:**
+
 - WebSocket providers may have different rate limits
 - Requires proper connection management and reconnection logic
 - Consider using libraries like `socket.io-client` for reliability
@@ -283,6 +306,7 @@ This project is built as a take-home assignment for a Crypto Full-Stack Develope
 ## 👤 Author
 
 **AlgoriThai07**
+
 - GitHub: [@AlgoriThai07](https://github.com/AlgoriThai07)
 
 ---

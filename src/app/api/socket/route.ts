@@ -12,11 +12,11 @@ const buildBitcoinUrl = () => {
     vs_currencies: "usd",
     include_24hr_change: "true",
   });
-  
+
   if (COINGECKO_API_KEY) {
     params.append("x_cg_pro_api_key", COINGECKO_API_KEY);
   }
-  
+
   return `${baseUrl}?${params.toString()}`;
 };
 
@@ -30,13 +30,13 @@ const MIN_FETCH_INTERVAL = 10000; // 10 seconds minimum between API calls
 /**
  * Server-Sent Events (SSE) endpoint for real-time Bitcoin price updates
  * Streams BTC price to connected clients every 10 seconds
- * 
+ *
  * Usage: new EventSource('/api/socket')
  */
 export async function GET(request: NextRequest) {
   // Create a readable stream for SSE
   const encoder = new TextEncoder();
-  
+
   let intervalId: NodeJS.Timeout | null = null;
   let isClosed = false;
 
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
 
         try {
           const now = Date.now();
-          
+
           // Rate limiting: Use cached data if fetched recently
           if (now - lastFetchTime < MIN_FETCH_INTERVAL && cachedBTCData) {
             const cachedMessage = `data: ${JSON.stringify({
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
           const response = await axios.get(COINGECKO_BTC_URL, {
             timeout: 8000,
             headers: {
-              'Accept': 'application/json',
+              Accept: "application/json",
             },
           });
 
@@ -85,7 +85,10 @@ export async function GET(request: NextRequest) {
 
           // Validate response data
           if (!response.data || !response.data.bitcoin) {
-            console.error("[SSE] Invalid API response structure:", response.data);
+            console.error(
+              "[SSE] Invalid API response structure:",
+              response.data
+            );
             throw new Error("Invalid API response structure");
           }
 
@@ -111,7 +114,7 @@ export async function GET(request: NextRequest) {
           controller.enqueue(encoder.encode(message));
         } catch (error) {
           console.error("Error fetching Bitcoin price:", error);
-          
+
           // If we have cached data, send it instead of error
           if (cachedBTCData) {
             const cachedMessage = `data: ${JSON.stringify({
@@ -123,7 +126,7 @@ export async function GET(request: NextRequest) {
               timestamp: new Date().toISOString(),
             })}\n\n`;
             controller.enqueue(encoder.encode(cachedMessage));
-            
+
             // Also send a warning message
             const warningMessage = `data: ${JSON.stringify({
               type: "warning",
@@ -135,8 +138,8 @@ export async function GET(request: NextRequest) {
             // No cached data available, send error
             const errorMessage = `data: ${JSON.stringify({
               type: "error",
-              message: axios.isAxiosError(error) 
-                ? `API Error: ${error.message}` 
+              message: axios.isAxiosError(error)
+                ? `API Error: ${error.message}`
                 : "Failed to fetch Bitcoin price",
               timestamp: new Date().toISOString(),
             })}\n\n`;

@@ -72,7 +72,7 @@ export default function IndicatorDetailPage() {
         // Map timestamps to formatted date strings (Nov 07, 2025) and store as { date, price }[]
         const formattedData = prices.map(([timestamp, price]) => {
           const date = new Date(timestamp);
-          const month = date.toLocaleString('en-US', { month: 'short' });
+          const month = date.toLocaleString("en-US", { month: "short" });
           const day = date.getDate().toString().padStart(2, "0");
           const year = date.getFullYear();
           return {
@@ -192,7 +192,8 @@ export default function IndicatorDetailPage() {
             {coinInfo && (
               <div className="flex flex-col md:items-end gap-2">
                 <div className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
-                  ${coinInfo.currentPrice.toLocaleString(undefined, {
+                  $
+                  {coinInfo.currentPrice.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -281,7 +282,8 @@ export default function IndicatorDetailPage() {
                 Data Source
               </p>
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                All price data is provided by CoinGecko API with 2-minute caching for optimal performance.
+                All price data is provided by CoinGecko API with 2-minute
+                caching for optimal performance.
               </p>
             </div>
           </div>

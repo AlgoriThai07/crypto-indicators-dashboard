@@ -28,11 +28,13 @@ export default function Dashboard() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch crypto indicators");
+          throw new Error(
+            errorData.error || "Failed to fetch crypto indicators"
+          );
         }
 
         const result = await response.json();
-        
+
         // Even if data is stale, still show it
         if (result.data && result.data.length > 0) {
           setIndicators(result.data);

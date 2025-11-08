@@ -25,7 +25,7 @@ interface UseLiveBitcoinReturn {
 
 /**
  * Custom hook to connect to the Bitcoin price SSE stream
- * 
+ *
  * @example
  * const { price, change24h, isConnected } = useLiveBitcoin();
  */
@@ -36,7 +36,7 @@ export function useLiveBitcoin(): UseLiveBitcoinReturn {
   const [isCached, setIsCached] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
-  
+
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 

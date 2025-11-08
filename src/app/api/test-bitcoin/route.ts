@@ -16,7 +16,7 @@ export async function GET() {
     const response = await axios.get(COINGECKO_BTC_URL, {
       timeout: 10000,
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
     });
 

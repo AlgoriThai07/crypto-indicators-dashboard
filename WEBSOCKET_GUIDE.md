@@ -7,9 +7,11 @@ This implementation uses **Server-Sent Events (SSE)** instead of traditional Web
 ## Architecture
 
 ### 1. **SSE Route**: `/api/socket`
+
 Located at: `src/app/api/socket/route.ts`
 
 **Features:**
+
 - Streams Bitcoin price updates every 10 seconds
 - Rate limiting: Minimum 10-second interval between API calls
 - Automatic caching to reduce API requests
@@ -18,11 +20,12 @@ Located at: `src/app/api/socket/route.ts`
 - Error handling for rate limits and network issues
 
 **Response Format:**
+
 ```json
 {
   "type": "price_update",
   "data": {
-    "price": 50000.50,
+    "price": 50000.5,
     "change24h": 2.5,
     "cached": false
   },
@@ -31,33 +34,37 @@ Located at: `src/app/api/socket/route.ts`
 ```
 
 **Message Types:**
+
 - `connected` - Initial connection success
 - `price_update` - Bitcoin price update
 - `error` - Error occurred while fetching data
 - `rate_limit` - Rate limit reached, using cached data
 
 ### 2. **Custom Hook**: `useLiveBitcoin`
+
 Located at: `src/hooks/useLiveBitcoin.ts`
 
 **Features:**
+
 - Automatic connection management
 - Auto-reconnect on connection loss (5-second delay)
 - Clean state management
 - Proper cleanup on unmount
 
 **Usage:**
+
 ```tsx
 import { useLiveBitcoin } from "@/hooks/useLiveBitcoin";
 
 function MyComponent() {
-  const { 
-    price,        // Current BTC price
-    change24h,    // 24h percentage change
-    isConnected,  // Connection status
-    isCached,     // Whether data is from cache
-    error,        // Error message if any
-    lastUpdate,   // Last update timestamp
-    reconnect     // Manual reconnect function
+  const {
+    price, // Current BTC price
+    change24h, // 24h percentage change
+    isConnected, // Connection status
+    isCached, // Whether data is from cache
+    error, // Error message if any
+    lastUpdate, // Last update timestamp
+    reconnect, // Manual reconnect function
   } = useLiveBitcoin();
 
   return (
@@ -70,9 +77,11 @@ function MyComponent() {
 ```
 
 ### 3. **UI Component**: `LiveBitcoinPrice`
+
 Located at: `src/components/LiveBitcoinPrice.tsx`
 
 **Features:**
+
 - Real-time price display
 - 24h change indicator with color coding
 - Connection status indicator
@@ -103,36 +112,41 @@ Located at: `src/components/LiveBitcoinPrice.tsx`
 ## Testing the Implementation
 
 ### 1. **Start the Development Server**
+
 ```bash
 npm run dev
 ```
 
 ### 2. **Visit the Dashboard**
+
 Navigate to: http://localhost:3000/dashboard
 
 You should see the "Live Bitcoin Price" widget at the top displaying real-time updates.
 
 ### 3. **Test Connection**
+
 - Watch for the "Connected" badge (green)
 - Price should update every 10 seconds
 - Check browser console for connection logs
 
 ### 4. **Test Error Handling**
+
 - Disconnect from internet
 - Watch for "Disconnected" status
 - Reconnect and see auto-reconnect in action
 
 ### 5. **Manual Testing with EventSource**
+
 ```javascript
 // Open browser console
-const eventSource = new EventSource('/api/socket');
+const eventSource = new EventSource("/api/socket");
 
 eventSource.onmessage = (event) => {
-  console.log('Received:', JSON.parse(event.data));
+  console.log("Received:", JSON.parse(event.data));
 };
 
 eventSource.onerror = (error) => {
-  console.error('Error:', error);
+  console.error("Error:", error);
 };
 
 // Close connection
@@ -142,6 +156,7 @@ eventSource.close();
 ## Integration Examples
 
 ### Example 1: Simple Price Display
+
 ```tsx
 "use client";
 import { useLiveBitcoin } from "@/hooks/useLiveBitcoin";
@@ -162,6 +177,7 @@ export default function SimplePriceWidget() {
 ```
 
 ### Example 2: Price Alert System
+
 ```tsx
 "use client";
 import { useLiveBitcoin } from "@/hooks/useLiveBitcoin";
@@ -183,6 +199,7 @@ export default function PriceAlert() {
 ```
 
 ### Example 3: Price History Tracker
+
 ```tsx
 "use client";
 import { useLiveBitcoin } from "@/hooks/useLiveBitcoin";
@@ -190,11 +207,13 @@ import { useEffect, useState } from "react";
 
 export default function PriceHistory() {
   const { price, lastUpdate } = useLiveBitcoin();
-  const [history, setHistory] = useState<Array<{ price: number; time: string }>>([]);
+  const [history, setHistory] = useState<
+    Array<{ price: number; time: string }>
+  >([]);
 
   useEffect(() => {
     if (price && lastUpdate) {
-      setHistory(prev => [...prev, { price, time: lastUpdate }].slice(-10));
+      setHistory((prev) => [...prev, { price, time: lastUpdate }].slice(-10));
     }
   }, [price, lastUpdate]);
 
@@ -204,7 +223,8 @@ export default function PriceHistory() {
       <ul>
         {history.map((entry, i) => (
           <li key={i}>
-            ${entry.price.toFixed(2)} at {new Date(entry.time).toLocaleTimeString()}
+            ${entry.price.toFixed(2)} at{" "}
+            {new Date(entry.time).toLocaleTimeString()}
           </li>
         ))}
       </ul>
@@ -222,11 +242,13 @@ export default function PriceHistory() {
 **Response Type**: `text/event-stream`
 
 **Headers**:
+
 - `Content-Type: text/event-stream`
 - `Cache-Control: no-cache, no-transform`
 - `Connection: keep-alive`
 
 **Connection Flow**:
+
 1. Client connects via EventSource
 2. Server sends "connected" message
 3. Server sends initial price update
@@ -237,12 +259,14 @@ export default function PriceHistory() {
 ## Performance Considerations
 
 ### Server-Side:
+
 - **Memory**: Minimal - only stores last fetched data
 - **CPU**: Low - periodic fetch every 10 seconds
 - **Network**: ~6 requests/minute to CoinGecko
 - **Scalability**: Can handle multiple concurrent connections
 
 ### Client-Side:
+
 - **Memory**: Very low - just the hook state
 - **CPU**: Minimal - only JSON parsing
 - **Network**: Persistent SSE connection (~1KB/update)
@@ -251,12 +275,15 @@ export default function PriceHistory() {
 ## Troubleshooting
 
 ### Connection Issues:
+
 1. **Connection not established**:
+
    - Check if `/api/socket` route exists
    - Verify CORS settings if using custom domain
    - Check browser console for errors
 
 2. **Frequent disconnections**:
+
    - Network instability
    - Server timeout settings
    - Firewall/proxy blocking SSE
@@ -267,6 +294,7 @@ export default function PriceHistory() {
    - Check cache is working properly
 
 ### Debugging:
+
 ```typescript
 // Enable verbose logging in useLiveBitcoin hook
 console.log("Connection state:", isConnected);
@@ -278,15 +306,16 @@ console.log("Is cached:", isCached);
 ## Alternatives & Upgrades
 
 ### WebSocket with Custom Server:
+
 If you need bidirectional communication, you can add a custom WebSocket server:
 
 ```typescript
 // server.js (Custom Node.js server)
-import { createServer } from 'http';
-import { WebSocketServer } from 'ws';
-import next from 'next';
+import { createServer } from "http";
+import { WebSocketServer } from "ws";
+import next from "next";
 
-const dev = process.env.NODE_ENV !== 'production';
+const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
@@ -295,19 +324,19 @@ app.prepare().then(() => {
     handle(req, res);
   });
 
-  const wss = new WebSocketServer({ server, path: '/ws' });
+  const wss = new WebSocketServer({ server, path: "/ws" });
 
-  wss.on('connection', (ws) => {
-    console.log('Client connected');
-    
+  wss.on("connection", (ws) => {
+    console.log("Client connected");
+
     const interval = setInterval(() => {
       // Send price updates
       ws.send(JSON.stringify({ price: 50000 }));
     }, 10000);
 
-    ws.on('close', () => {
+    ws.on("close", () => {
       clearInterval(interval);
-      console.log('Client disconnected');
+      console.log("Client disconnected");
     });
   });
 
@@ -316,6 +345,7 @@ app.prepare().then(() => {
 ```
 
 ### Third-Party WebSocket APIs:
+
 - **Binance WebSocket**: Real-time trading data
 - **Coinbase WebSocket**: Professional trading feeds
 - **CryptoCompare**: Multi-source price feeds
@@ -331,16 +361,20 @@ app.prepare().then(() => {
 ## Production Deployment
 
 ### Environment Variables:
+
 ```env
 # Optional: Add API keys for higher rate limits
 COINGECKO_API_KEY=your_api_key_here
 ```
 
 ### Vercel Deployment:
+
 SSE works perfectly on Vercel. No special configuration needed.
 
 ### Self-Hosted:
+
 Ensure your server/proxy supports SSE:
+
 - Disable response buffering
 - Set proper timeout values
 - Configure keep-alive settings

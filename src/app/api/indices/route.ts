@@ -15,12 +15,12 @@ const buildApiUrl = () => {
     per_page: "15",
     page: "1",
   });
-  
+
   // Add API key if available (for Pro/Enterprise tier)
   if (COINGECKO_API_KEY) {
     params.append("x_cg_pro_api_key", COINGECKO_API_KEY);
   }
-  
+
   return `${baseUrl}?${params.toString()}`;
 };
 
@@ -75,16 +75,18 @@ export async function GET() {
 
     // Increment request counter
     requestCount++;
-    console.log(`[API] Request ${requestCount}/${MAX_REQUESTS_PER_MINUTE} in current window`);
+    console.log(
+      `[API] Request ${requestCount}/${MAX_REQUESTS_PER_MINUTE} in current window`
+    );
 
     // Fetch from CoinGecko API
     const headers: Record<string, string> = {
-      'Accept': 'application/json',
+      Accept: "application/json",
     };
 
     // Add API key to headers if available (Pro tier)
     if (COINGECKO_API_KEY) {
-      headers['x-cg-pro-api-key'] = COINGECKO_API_KEY;
+      headers["x-cg-pro-api-key"] = COINGECKO_API_KEY;
       console.log("[API] Using CoinGecko Pro API key");
     } else {
       console.log("[API] Using CoinGecko free tier (no API key)");
@@ -113,7 +115,7 @@ export async function GET() {
 
     // Try to serve stale data when rate-limited or error occurs
     const staleData = cache.get<CryptoIndex[]>(STALE_CACHE_KEY);
-    
+
     if (staleData) {
       console.log("[API] Serving stale data due to error");
       return NextResponse.json({
@@ -128,8 +130,9 @@ export async function GET() {
     // Handle rate limiting - no stale data available
     if (axios.isAxiosError(error) && error.response?.status === 429) {
       return NextResponse.json(
-        { 
-          error: "Rate limit exceeded. No cached data available. Please try again in a few minutes.",
+        {
+          error:
+            "Rate limit exceeded. No cached data available. Please try again in a few minutes.",
           retryAfter: 60, // seconds
         },
         { status: 429 }

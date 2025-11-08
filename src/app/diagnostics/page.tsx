@@ -11,7 +11,7 @@ export default function DiagnosticsPage() {
   const testCoinGeckoAPI = async () => {
     setLoading(true);
     setTestResult(null);
-    
+
     try {
       const response = await fetch("/api/test-bitcoin");
       const data = await response.json();
@@ -37,7 +37,11 @@ export default function DiagnosticsPage() {
         setSSEStatus("✅ Connected");
         setSSEMessages((prev) => [
           ...prev,
-          { time: new Date().toISOString(), type: "connection", message: "Connected" },
+          {
+            time: new Date().toISOString(),
+            type: "connection",
+            message: "Connected",
+          },
         ]);
       };
 
@@ -53,7 +57,11 @@ export default function DiagnosticsPage() {
         setSSEStatus("❌ Error");
         setSSEMessages((prev) => [
           ...prev,
-          { time: new Date().toISOString(), type: "error", message: "Connection error" },
+          {
+            time: new Date().toISOString(),
+            type: "error",
+            message: "Connection error",
+          },
         ]);
       };
 
@@ -87,7 +95,7 @@ export default function DiagnosticsPage() {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             Test CoinGecko API
           </h2>
-          
+
           <button
             onClick={testCoinGeckoAPI}
             disabled={loading}
@@ -118,7 +126,7 @@ export default function DiagnosticsPage() {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             Test SSE Connection
           </h2>
-          
+
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={testSSEConnection}
@@ -179,7 +187,11 @@ export default function DiagnosticsPage() {
             <li>Check browser console for detailed error messages</li>
             <li>Check server terminal logs for API response details</li>
             <li>If rate-limited, wait a few minutes and try again</li>
-            <li>Try accessing https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd directly in browser</li>
+            <li>
+              Try accessing
+              https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd
+              directly in browser
+            </li>
           </ol>
         </div>
       </div>

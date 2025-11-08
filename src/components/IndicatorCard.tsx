@@ -43,7 +43,8 @@ export default function IndicatorCard({
         {/* Price in USD */}
         <div className="mb-3">
           <p className="text-2xl font-bold text-slate-900 dark:text-white">
-            ${price.toLocaleString(undefined, {
+            $
+            {price.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
