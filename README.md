@@ -2,20 +2,22 @@
 
 A professional cryptocurrency tracking dashboard built with **Next.js 16**, **TypeScript**, **Tailwind CSS**, and **Recharts**. Features real-time crypto data with intelligent server-side caching and interactive 30-day price charts.
 
-## � Project Overview
+## 📊 Project Overview
 
-This application provides a clean, responsive interface for monitoring cryptocurrency market data. It fetches real-time information from the CoinGecko API and displays the top 10 cryptocurrencies by market cap with 24-hour price changes. Users can click on any cryptocurrency to view detailed 30-day price history charts.
+This application provides a clean, responsive interface for monitoring cryptocurrency market data. It fetches real-time information from the CoinGecko API and displays the top 15 cryptocurrencies by market cap with 24-hour price changes. Users can click on any cryptocurrency to view detailed 30-day price history charts with accurate linear visualization.
 
 **Key Features:**
 
-- Real-time cryptocurrency market data for 10 major coins
-- **Live Bitcoin price streaming** via Server-Sent Events (SSE)
-- Interactive 30-day historical price charts
-- Server-side caching to optimize API usage
+- **Live Bitcoin Price Widget** - Real-time BTC price updates via Server-Sent Events (SSE)
+- Real-time cryptocurrency market data for 12 major coins
+- Interactive 30-day historical price charts with linear accuracy
+- Unified homepage with full dashboard functionality
+- Client-side rendering with optimized data fetching
+- Server-side caching to optimize API usage (120s TTL)
 - Responsive design with dark mode support
 - Loading states and graceful error handling
-- Rate-limit compliant architecture
-- Auto-reconnecting WebSocket alternative
+- Rate-limit compliant architecture with automatic fallback
+- Auto-reconnecting SSE stream with heartbeat
 
 ## 🛠️ Tech Stack
 
@@ -175,8 +177,8 @@ The application implements intelligent server-side caching using **NodeCache** t
    ```
 
 4. **Open your browser**:
-   - Main dashboard: [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
-   - Alternative view: [http://localhost:3000](http://localhost:3000)
+   - Homepage (main dashboard): [http://localhost:3000](http://localhost:3000)
+   - Individual crypto details: [http://localhost:3000/indices/bitcoin](http://localhost:3000/indices/bitcoin)
 
 ### Production Build
 
@@ -230,45 +232,75 @@ The application is designed to comply with CoinGecko API rate limits:
 - Without cache: ~1,800 requests/hour (exceeds limits)
 - With cache: ~30 requests/hour (well within limits)
 
-## 💡 Future Enhancements
+## 🎨 Key Components
 
-### WebSocket Integration for Live Updates
+### LiveBitcoinPrice Widget
 
-For real-time price updates without polling, consider implementing WebSocket connections:
+Real-time Bitcoin price display using Server-Sent Events (SSE):
 
-**Benefits:**
+- **Updates**: Every 10 seconds
+- **Features**:
+  - Live connection indicator (pulsing dot)
+  - 24-hour price change percentage
+  - Cached data indicator during rate limits
+  - Auto-reconnection on disconnect
+  - Error handling with manual reconnect option
 
-- Instant price updates without page refresh
-- Reduced server load compared to polling
-- Better user experience with live data
+### ChartView Component
 
-**Implementation Approach:**
+30-day historical price chart with accurate linear visualization:
+
+- **Chart Type**: Area chart with gradient fill
+- **Line Type**: Linear (accurate data representation)
+- **Y-Axis**: Auto-scaled domain for optimal viewing
+- **Tooltip**: Hover to see exact price and date
+- **Styling**: Dark theme with cyan-to-blue gradient
+
+### useLiveBitcoin Hook
+
+Custom React hook for SSE connection management:
 
 ```typescript
-// Example: CoinGecko doesn't offer WebSockets, but you could integrate
-// with alternative providers like:
-// - Binance WebSocket API
-// - Coinbase WebSocket Feed
-// - CryptoCompare WebSocket API
-
-// Client-side example:
-useEffect(() => {
-  const ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@ticker");
-
-  ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    updatePrice(data.c); // Current price
-  };
-
-  return () => ws.close();
-}, []);
+const {
+  price,
+  change24h,
+  isConnected,
+  isCached,
+  error,
+  lastUpdate,
+  reconnect,
+} = useLiveBitcoin();
 ```
 
-**Considerations:**
+- Manages EventSource connection lifecycle
+- Handles reconnection with exponential backoff
+- Parses SSE messages (connected, price_update, error, rate_limit)
+- Provides real-time state updates
 
-- WebSocket providers may have different rate limits
-- Requires proper connection management and reconnection logic
-- Consider using libraries like `socket.io-client` for reliability
+## 💡 Recent Improvements
+
+### ✅ Unified Dashboard Experience
+
+- Combined homepage and dashboard into a single route (`/`)
+- Client-side rendering for optimal interactivity
+- Removed redundant `/dashboard` route
+
+### ✅ Live Bitcoin Price Streaming
+
+- Implemented SSE endpoint for real-time BTC price updates
+- Auto-reconnecting connection with 5-second retry
+- Graceful handling of rate limits with cached data fallback
+
+### ✅ Chart Accuracy Fix
+
+- Changed from monotone to **linear interpolation** for accurate data representation
+- Auto-scaling Y-axis domain (`["auto", "auto"]`)
+- Price movements now correctly match actual data (down = line goes down, up = line goes up)
+
+### ✅ Navigation Improvements
+
+- "Back to Dashboard" buttons now redirect to homepage (`/`)
+- Consistent navigation flow throughout the app
 
 ## � Project Structure
 
@@ -277,21 +309,29 @@ crypto-indicators-dashboard/
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   └── indices/
-│   │   │       ├── route.ts                    # Main API endpoint
-│   │   │       └── [id]/history/route.ts       # Historical data endpoint
-│   │   ├── dashboard/
-│   │   │   └── page.tsx                        # Main dashboard page
+│   │   │   ├── indices/
+│   │   │   │   ├── route.ts                    # Main API endpoint (15 coins)
+│   │   │   │   └── [id]/history/route.ts       # Historical data endpoint
+│   │   │   └── socket/
+│   │   │       └── route.ts                    # SSE endpoint for live BTC price
 │   │   ├── indices/[id]/
-│   │   │   └── page.tsx                        # Coin detail page
-│   │   └── globals.css
+│   │   │   └── page.tsx                        # Coin detail page with 30-day chart
+│   │   ├── page.tsx                            # Main homepage (unified dashboard)
+│   │   ├── layout.tsx                          # Root layout
+│   │   └── globals.css                         # Global styles
 │   ├── components/
 │   │   ├── IndicatorCard.tsx                   # Crypto card component
-│   │   └── ChartView.tsx                       # Chart component
+│   │   ├── ChartView.tsx                       # 30-day chart component (linear)
+│   │   └── LiveBitcoinPrice.tsx                # Live BTC price widget (SSE)
+│   ├── hooks/
+│   │   └── useLiveBitcoin.ts                   # Custom hook for SSE connection
 │   ├── lib/
 │   │   └── cache.ts                            # NodeCache configuration
 │   └── types/
 │       └── crypto.ts                           # TypeScript interfaces
+├── API_COMPLIANCE.md                           # API usage documentation
+├── RATE_LIMIT_GUIDE.md                         # Rate limiting guide
+├── WEBSOCKET_GUIDE.md                          # SSE implementation guide
 └── package.json
 ```
 
