@@ -62,8 +62,16 @@ export default function ChartView({ data }: ChartViewProps) {
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   const priceRange = maxPrice - minPrice;
-  const yAxisMin = Math.floor(minPrice - priceRange * 0.05);
-  const yAxisMax = Math.ceil(maxPrice + priceRange * 0.05);
+  // Add small padding (2%) to min/max for better visualization
+  const yAxisMin = minPrice - priceRange * 0.02;
+  const yAxisMax = maxPrice + priceRange * 0.02;
+
+  // Debug: Log first few and last few data points
+  if (data.length > 0) {
+    console.log("Chart data - First 3 points:", data.slice(0, 3));
+    console.log("Chart data - Last 3 points:", data.slice(-3));
+    console.log("Y-axis domain:", [yAxisMin, yAxisMax]);
+  }
 
   return (
     <div
@@ -137,7 +145,7 @@ export default function ChartView({ data }: ChartViewProps) {
                 tick={{ fill: "#9ca3af", fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
-                domain={[yAxisMin, yAxisMax]}
+                domain={["auto", "auto"]}
                 tickFormatter={(value) =>
                   `$${value.toLocaleString(undefined, {
                     minimumFractionDigits: 0,
@@ -160,7 +168,7 @@ export default function ChartView({ data }: ChartViewProps) {
 
               {/* Area fill with gradient */}
               <Area
-                type="monotone"
+                type="linear"
                 dataKey="price"
                 stroke="url(#lineGradient)"
                 strokeWidth={2.5}

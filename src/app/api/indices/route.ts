@@ -12,7 +12,7 @@ const buildApiUrl = () => {
   const params = new URLSearchParams({
     vs_currency: "usd",
     order: "market_cap_desc",
-    per_page: "15",
+    per_page: "12",
     page: "1",
   });
 
@@ -104,7 +104,11 @@ export async function GET() {
     cache.set(CACHE_KEY, data, CACHE_TTL); // Normal cache with TTL
     cache.set(STALE_CACHE_KEY, data, 0); // Stale cache (no expiry)
 
-    console.log("[API] ✅ Successfully fetched and cached", data.length, "coins");
+    console.log(
+      "[API] ✅ Successfully fetched and cached",
+      data.length,
+      "coins"
+    );
 
     return NextResponse.json({
       data,
@@ -113,7 +117,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("❌ [API] Error fetching crypto indices:", error);
-    
+
     if (axios.isAxiosError(error)) {
       console.error("❌ [API] Axios error details:", {
         status: error.response?.status,

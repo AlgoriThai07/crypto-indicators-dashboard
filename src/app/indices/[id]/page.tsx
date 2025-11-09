@@ -119,10 +119,10 @@ export default function IndicatorDetailPage() {
           </h2>
           <p className="text-red-600 dark:text-red-400 mb-6">{error}</p>
           <button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/")}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200"
           >
-            Back to Dashboard
+            Back to Home
           </button>
         </div>
       </div>
@@ -141,9 +141,9 @@ export default function IndicatorDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Back to dashboard button */}
+        {/* Back to home button */}
         <button
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.push("/")}
           className="mb-6 inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-colors"
         >
           <svg
@@ -159,7 +159,7 @@ export default function IndicatorDetailPage() {
               d="M10 19l-7-7m0 0l7-7m-7 7h18"
             />
           </svg>
-          Back to Dashboard
+          Back to Home
         </button>
 
         {/* Coin Header Card */}

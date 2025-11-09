@@ -39,7 +39,9 @@ export function useLiveBitcoin(): UseLiveBitcoinReturn {
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const connectFnRef = useRef<(() => void) | null>(null);
 
+  // Define connect function
   const connect = useCallback(() => {
     // Close existing connection if any
     if (eventSourceRef.current) {
@@ -86,18 +88,14 @@ export function useLiveBitcoin(): UseLiveBitcoinReturn {
 
             case "error":
               console.error("Stream error:", message.message);
-              // Only show error if we don't have any price data
-              if (price === null) {
-                setError(message.message || "Unable to fetch price data");
-              }
+              // Always set error state, but it won't show if we have price data (handled in component)
+              setError(message.message || "Unable to fetch price data");
               break;
 
             case "rate_limit":
               console.warn("Rate limit:", message.message);
-              // Don't show as critical error if we have cached data
-              if (price === null) {
-                setError("Rate limit reached. Waiting for next update...");
-              }
+              // Set rate limit message
+              setError("Rate limit reached. Waiting for next update...");
               break;
           }
         } catch (err) {
@@ -113,10 +111,10 @@ export function useLiveBitcoin(): UseLiveBitcoinReturn {
         // Close the connection
         eventSource.close();
 
-        // Attempt to reconnect after 5 seconds
+        // Attempt to reconnect after 5 seconds using the ref
         reconnectTimeoutRef.current = setTimeout(() => {
           console.log("Attempting to reconnect...");
-          connect();
+          connectFnRef.current?.();
         }, 5000);
       };
     } catch (err) {
@@ -126,9 +124,12 @@ export function useLiveBitcoin(): UseLiveBitcoinReturn {
     }
   }, []);
 
+  // Store connect function in ref so it can be called recursively
+  connectFnRef.current = connect;
+
   const reconnect = useCallback(() => {
-    connect();
-  }, [connect]);
+    connectFnRef.current?.();
+  }, []);
 
   useEffect(() => {
     connect();
@@ -142,7 +143,8 @@ export function useLiveBitcoin(): UseLiveBitcoinReturn {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, [connect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   return {
     price,
