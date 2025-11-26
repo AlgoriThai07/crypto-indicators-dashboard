@@ -2,6 +2,14 @@
 
 A professional cryptocurrency tracking dashboard built with **Next.js 16**, **TypeScript**, **Tailwind CSS**, and **Recharts**. Features real-time crypto data with intelligent server-side caching and interactive 30-day price charts.
 
+## 🎥 Project Demo
+
+[![Watch the Demo](https://cdn.loom.com/sessions/thumbnails/911c17432816445db5c50569c2cc3ab0-e6e14755986d9921-full-play.gif)](https://www.loom.com/share/911c17432816445db5c50569c2cc3ab0)
+
+**Building a Scalable Crypto Indicators Dashboard with Real-Time Updates 🚀 — Click to Watch**
+
+---
+
 ## 📊 Project Overview
 
 This application provides a clean, responsive interface for monitoring cryptocurrency market data. It fetches real-time information from the CoinGecko API and displays the top 15 cryptocurrencies by market cap with 24-hour price changes. Users can click on any cryptocurrency to view detailed 30-day price history charts with accurate linear visualization.
